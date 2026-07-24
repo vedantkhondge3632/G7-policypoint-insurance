@@ -1,1 +1,0 @@
-# G7-policypoint-insurance
