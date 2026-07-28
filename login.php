@@ -22,36 +22,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $conn->prepare("SELECT id, company_name, password FROM admins WHERE email = ?");
+        $stmt = $conn->prepare("SELECT id, name, password FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($row = $result->fetch_assoc()) {
             if (password_verify($password, $row['password'])) {
-                $_SESSION['admin_id'] = $row['id'];
-                $_SESSION['admin_company'] = $row['company_name'];
-                $_SESSION['admin_email'] = $email;
-                header("Location: dashboard.php");
+                $_SESSION['user_id'] = $row['id'];
+                $_SESSION['user_name'] = $row['name'];
+                $_SESSION['user_email'] = $email;
+                header("Location: home.php");
                 exit;
             } else {
                 $errors[] = "Incorrect password. Please try again.";
             }
         } else {
-            $errors[] = "No company account found with this email. Please register first.";
+            $errors[] = "No account found with this email. Please register first.";
         }
         $stmt->close();
     }
 }
 
-$pageTitle = "Company Login";
-include __DIR__ . "/../includes/header_admin.php";
+$pageTitle = "User Login";
+$baseUrl = "";
+include __DIR__ . "/../includes/header_user.php";
 ?>
 
 <div class="container">
   <div class="form-wrap card">
-    <h2 class="page-title">Company Login</h2>
-    <p class="page-subtitle">Log in to manage your insurance policies</p>
+    <h2 class="page-title">User Login</h2>
+    <p class="page-subtitle">Log in to browse and apply for insurance plans</p>
 
     <?php if (!empty($successMsg)): ?>
       <div class="alert alert-success"><?php echo htmlspecialchars($successMsg); ?></div>
@@ -65,7 +66,7 @@ include __DIR__ . "/../includes/header_admin.php";
 
     <form method="POST" id="loginForm" onsubmit="return validateLoginForm(this)">
       <div class="form-group">
-        <label for="email">Company Email</label>
+        <label for="email">Email Address</label>
         <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
       </div>
       <div class="form-group">
@@ -74,7 +75,7 @@ include __DIR__ . "/../includes/header_admin.php";
       </div>
       <button type="submit" class="btn btn-block">Login</button>
     </form>
-    <p class="form-footer-link">New company? <a href="register.php" style="color:#1c4e80;font-weight:600;">Register here</a></p>
+    <p class="form-footer-link">Don't have an account? <a href="register.php" style="color:#1c4e80;font-weight:600;">Register here</a></p>
   </div>
 </div>
 
